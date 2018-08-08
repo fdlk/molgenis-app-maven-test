@@ -27,7 +27,7 @@ for tag in "${TAGS[@]}"; do
 done
 
 if [[ ${RELEASE_SCOPE} = "candidate" ]]; then
-  VERSION_POSTFIX="-RC-${CANDIDATE_NUMBER}"
+  VERSION_POSTFIX="-RC${CANDIDATE_NUMBER}"
 else
   VERSION_POSTFIX="-RELEASE"
 fi
