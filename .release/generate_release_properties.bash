@@ -43,6 +43,6 @@ echo "------------------------------------------"
 echo "Release version       : ${RELEASE_VERSION}"
 echo "New dev version       : ${DEV_VERSION}"
 
-echo "scm.tag=${RELEASE_VERSION}\n
-project.rel.${GROUP_ID}\:${ARTIFACT_ID}=${RELEASE_VERSION}\n
+echo "scm.tag=${RELEASE_VERSION}
+project.rel.${GROUP_ID}\:${ARTIFACT_ID}=${RELEASE_VERSION}
 project.dev.${GROUP_ID}\:${ARTIFACT_ID}=${DEV_VERSION}" >> release.properties
