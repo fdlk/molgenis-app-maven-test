@@ -50,7 +50,7 @@
         <molgenis.build.timestamp>${maven.build.timestamp}</molgenis.build.timestamp>
 
         <!-- artifact publish properties -->
-        <sonatype.id>registry.molgenis.org</sonatype.id>
+        <sonatype.id>registry-molgenis-org</sonatype.id>
     </properties>
 
     <distributionManagement>
