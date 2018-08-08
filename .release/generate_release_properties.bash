@@ -22,7 +22,7 @@ TAGS=$(git tag -l "[${MAJOR}]\.[${MINOR}]\.[${PATCH}]-RC*")
 for tag in "${TAGS[@]}"; do
     RC_NUMBER=$(echo ${tag: -1})
     if [[ ! -z ${RC_NUMBER} ]]; then
-      ((${RC_NUMBER} > ${CANDIDATE_NUMBER})) && CANDIDATE_NUMBER=$((${RC_NUMBER}+1))
+      ((${RC_NUMBER} >= ${CANDIDATE_NUMBER})) && CANDIDATE_NUMBER=$((${RC_NUMBER}+1))
     fi
 done
 
