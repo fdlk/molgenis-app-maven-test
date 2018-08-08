@@ -86,6 +86,7 @@ pipeline {
                     sh "git config --global user.email git@molgenis.org"
                     sh "git config --global user.name ${GITHUB_CRED_USR}"
                     sh "git checkout -f ${BRANCH_NAME}"
+                    sh "git fetch --tags"
                     sh ".release/generate_release_properties.bash ${APP_NAME} ${ORG} ${env.RELEASE_SCOPE}"
                     sh "mvn release:prepare release:perform -Dmaven.test.redirectTestOutputToFile=true -DskipITs -Ddockerfile.tag=${BRANCH_NAME}-${TAG} -Ddockerfile.skip=false"
                 }
