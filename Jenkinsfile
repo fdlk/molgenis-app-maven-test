@@ -65,6 +65,8 @@ pipeline {
             }
             environment {
                 TAG = 'stable'
+                ORG = 'org.molgenis'
+                APP_NAME = 'molgenis-app-maven-test'
             }
             steps {
                 timeout(time: 10, unit: 'MINUTES') {
