@@ -67,6 +67,7 @@ pipeline {
                 TAG = 'stable'
                 ORG = 'org.molgenis'
                 APP_NAME = 'molgenis-app-maven-test'
+                GITHUB_CRED = credentials('molgenis-jenkins-github-secret')
             }
             steps {
                 timeout(time: 10, unit: 'MINUTES') {
@@ -83,7 +84,7 @@ pipeline {
                 milestone 1
                 container('maven') {
                     sh "git config --global user.email git@molgenis.org"
-                    sh "git config --global user.name molgenis-jenkins"
+                    sh "git config --global user.name ${GITHUB_CRED_USR}"
                     sh "git checkout -f ${BRANCH_NAME}"
                     sh ".release/generate_release_properties.bash ${APP_NAME} ${ORG} ${env.RELEASE_SCOPE}"
                     sh "mvn release:prepare release:perform -Dmaven.test.redirectTestOutputToFile=true -DskipITs -Ddockerfile.tag=${BRANCH_NAME}-${TAG} -Ddockerfile.skip=false"
