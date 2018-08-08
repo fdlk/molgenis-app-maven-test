@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.molgenis</groupId>
-    <artifactId>molgenis</artifactId>
+    <artifactId>molgenis-app-maven-test</artifactId>
     <version>7.0.0-SNAPSHOT</version>
     <parent>
         <groupId>io.spring.platform</groupId>
@@ -25,8 +25,8 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:https://github.com/molgenis/molgenis.git</connection>
-        <url>https://github.com/molgenis/molgenis</url>
+        <connection>scm:git:https://github.com/molgenis/molgenis-app-maven-test.git</connection>
+        <url>https://github.com/molgenis/molgenis-app-maven-test</url>
     </scm>
 
     <developers>
