@@ -25,7 +25,7 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:https://github.com/molgenis/molgenis-app-maven-test.git</connection>
+        <connection>scm:git:https://github.com/sidohaakma/molgenis-app-maven-test.git</connection>
         <url>https://github.com/molgenis/molgenis-app-maven-test</url>
     </scm>
 
