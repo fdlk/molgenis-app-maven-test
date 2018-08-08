@@ -48,7 +48,7 @@ pipeline {
         }
         stage('Build [ x.x ]') {
             when {
-                branch '[0-9]\\.[0-9]'
+                expression { BRANCH_NAME ==~ /[0-9]\.[0-9]/ }
             }
             environment {
                 TAG = 'stable'
@@ -61,7 +61,7 @@ pipeline {
         }
         stage('Release [ x.x ]') {
             when {
-                branch '[0-9]\\.[0-9]'
+                expression { BRANCH_NAME ==~ /[0-9]\.[0-9]/ }
             }
             environment {
                 TAG = 'stable'
