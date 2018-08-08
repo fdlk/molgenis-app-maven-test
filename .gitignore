@@ -25,4 +25,4 @@ molgenis-app-maven-test.iml
 .idea
 release.properties
 pom.xml.releaseBackup
-
+target/
