@@ -49,6 +49,10 @@
         <!-- molgenis specific properties -->
         <molgenis.build.timestamp>${maven.build.timestamp}</molgenis.build.timestamp>
 
+        <pgp-maven-plugin.version>1.1</pgp-maven-plugin.version>
+        <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+        <release-maven-plugin.version>2.5.3</release-maven-plugin.version>
+
         <!-- artifact publish properties -->
         <sonatype.id>sonatype-nexus-staging</sonatype.id>
     </properties>
