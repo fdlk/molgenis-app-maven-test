@@ -65,7 +65,8 @@ pipeline {
             }
             environment {
                 TAG = 'stable'
-                ORG = 'org.molgenis'
+                ORG = 'molgenis'
+                GROUP_NAME = 'org.molgenis'
                 APP_NAME = 'molgenis-app-maven-test'
                 GITHUB_CRED = credentials('molgenis-jenkins-github-secret')
             }
@@ -85,10 +86,11 @@ pipeline {
                 container('maven') {
                     sh "git config --global user.email git@molgenis.org"
                     sh "git config --global user.name ${GITHUB_CRED_USR}"
+                    sh "git remote set-url origin https://${env.GITHUB_CRED_PSW}@github.com/${ORG}/${APP_NAME}.git"
                     sh "git checkout -f ${BRANCH_NAME}"
-                    sh "git fetch --tags"
                     sh ".release/generate_release_properties.bash ${APP_NAME} ${ORG} ${env.RELEASE_SCOPE}"
                     sh "mvn release:prepare release:perform -Dmaven.test.redirectTestOutputToFile=true -DskipITs -Ddockerfile.tag=${BRANCH_NAME}-${TAG} -Ddockerfile.skip=false"
+                    sh "git push --tags"
                 }
             }
         }

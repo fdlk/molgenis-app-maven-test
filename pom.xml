@@ -50,26 +50,47 @@
         <molgenis.build.timestamp>${maven.build.timestamp}</molgenis.build.timestamp>
 
         <!-- artifact publish properties -->
-        <sonatype.id>registry-molgenis-org</sonatype.id>
+        <sonatype.id>sonatype-nexus-staging</sonatype.id>
     </properties>
 
     <distributionManagement>
         <snapshotRepository>
             <id>${sonatype.id}</id>
-            <url>https://registry.molgenis.org/repository/maven-snapshots</url>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
             <id>${sonatype.id}</id>
-            <url>https://registry.molgenis.org/repository/maven-releases</url>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
 
     <build>
         <plugins>
             <plugin>
+                <groupId>org.kohsuke</groupId>
+                <artifactId>pgp-maven-plugin</artifactId>
+                <version>${pgp-maven-plugin.version}</version>
+            </plugin>
+            <!-- deploy to sonatype nexus -->
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>${nexus-staging-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>${sonatype.id}</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <!--<autoReleaseAfterClose>true</autoReleaseAfterClose>-->
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
+                <version>${release-maven-plugin.version}</version>
+                <configuration>
+                    <pushChanges>false</pushChanges>
+                    <scmCommentPrefix>[ci skip] [maven-release-plugin]</scmCommentPrefix>
+                </configuration>
             </plugin>
         </plugins>
     </build>
