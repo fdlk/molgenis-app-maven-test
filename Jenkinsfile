@@ -88,7 +88,7 @@ pipeline {
                     sh "git config --global user.name ${GITHUB_CRED_USR}"
                     sh "git remote set-url origin https://${env.GITHUB_CRED_PSW}@github.com/${ORG}/${APP_NAME}.git"
                     sh "git checkout -f ${BRANCH_NAME}"
-                    sh ".release/generate_release_properties.bash ${APP_NAME} ${ORG} ${env.RELEASE_SCOPE}"
+                    sh ".release/generate_release_properties.bash ${APP_NAME} ${GROUP_NAME} ${env.RELEASE_SCOPE}"
                     sh "mvn release:prepare release:perform -Dmaven.test.redirectTestOutputToFile=true -DskipITs -Ddockerfile.tag=${BRANCH_NAME}-${TAG} -Ddockerfile.skip=false"
                     sh "git push --tags origin ${BRANCH_NAME}"
                 }
