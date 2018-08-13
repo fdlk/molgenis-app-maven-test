@@ -97,6 +97,28 @@
                     <scmCommentPrefix>[ci skip] [maven-release-plugin]</scmCommentPrefix>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <doclint>none</doclint>
+                    <additionalOptions>--allow-script-in-comments</additionalOptions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- sign in a non-interactive way -->
+                <groupId>org.kohsuke</groupId>
+                <artifactId>pgp-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
