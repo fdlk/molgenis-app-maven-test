@@ -45,7 +45,7 @@ pipeline {
             }
             steps {
                 container('maven') {
-                    sh "mvn clean install -Dmaven.test.redirectTestOutputToFile=true -DskipITs -Ddockerfile.tag=${BRANCH_NAME}-${TAG} -Ddockerfile.skip=false"
+                    sh "mvn -B release:prepare"
                 }
             }
         }
