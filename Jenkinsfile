@@ -5,6 +5,12 @@ pipeline {
         }
     }
     stages {
+        stage('Retrieve build secrets') {
+            container('vault') {
+                env.GITHUB_USER = sh(script: 'vault read -field=username secret/ops/token/github', returnStdout: true)
+                env.GITHUB_TOKEN = sh(script: 'vault read -field=value secret/ops/token/github', returnStdout: true)
+            }
+        }
         stage('Build [ pull request ]') {
             when {
                 changeRequest()
