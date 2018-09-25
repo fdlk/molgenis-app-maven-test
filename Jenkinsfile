@@ -32,7 +32,7 @@ pipeline {
             }
             steps {
                 container('maven') {
-                    sh "mvn clean install -Dmaven.test.redirectTestOutputToFile=true -DskipITs -Ddockerfile.tag=${TAG} -Ddockerfile.skip=false"
+                    sh "mvn -q -B install"
                 }
             }
         }
@@ -45,7 +45,7 @@ pipeline {
             }
             steps {
                 container('maven') {
-                    sh "mvn -B release:prepare"
+                    sh "mvn -q -B release:prepare"
                 }
             }
         }
@@ -74,13 +74,11 @@ pipeline {
                 }
                 milestone 1
                 container('maven') {
-                    sh "git config --global user.email git@molgenis.org"
-                    sh "git config --global user.name ${GITHUB_CRED_USR}"
-                    sh "git remote set-url origin https://${env.GITHUB_CRED_PSW}@github.com/${ORG}/${APP_NAME}.git"
-                    sh "git checkout -f ${BRANCH_NAME}"
-                    sh ".release/generate_release_properties.bash ${APP_NAME} ${GROUP_NAME} ${env.RELEASE_SCOPE}"
-                    sh "mvn release:prepare release:perform -Dmaven.test.redirectTestOutputToFile=true -DskipITs -Ddockerfile.tag=${BRANCH_NAME}-${TAG} -Ddockerfile.skip=false"
-                    sh "git push --tags origin ${BRANCH_NAME}"
+//                    sh "git remote set-url origin https://${env.GITHUB_CRED_PSW}@github.com/${ORG}/${APP_NAME}.git"
+//                    sh "git checkout -f ${BRANCH_NAME}"
+//                    sh ".release/generate_release_properties.bash ${APP_NAME} ${GROUP_NAME} ${env.RELEASE_SCOPE}"
+                    sh "mvn release:perform"
+//                    sh "git push --tags origin ${BRANCH_NAME}"
                 }
             }
         }

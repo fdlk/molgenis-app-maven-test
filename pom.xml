@@ -69,6 +69,24 @@
     </distributionManagement>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <!-- sign in a non-interactive way -->
+                    <groupId>org.kohsuke</groupId>
+                    <artifactId>pgp-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>sign-artifacts</id>
+                            <phase>deploy</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.kohsuke</groupId>
@@ -105,20 +123,7 @@
                     <additionalOptions>--allow-script-in-comments</additionalOptions>
                 </configuration>
             </plugin>
-            <plugin>
-                <!-- sign in a non-interactive way -->
-                <groupId>org.kohsuke</groupId>
-                <artifactId>pgp-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+
         </plugins>
     </build>
 
