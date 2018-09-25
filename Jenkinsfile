@@ -23,7 +23,7 @@ pipeline {
                 //PR-1234-231
                 TAG = "PR-${CHANGE_ID}-${BUILD_NUMBER}"
                 //0.0.0-SNAPSHOT-PR-1234-231
-                PREVIEW_VERSION = "0.0.0-SNAPSHOT-${TAG}"
+                PREVIEW_VERSION = "0.0.0-SNAPSHOT-${TAG}"qq
             }
             steps {
                 container('maven') {
