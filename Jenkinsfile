@@ -4,17 +4,7 @@ pipeline {
             label 'molgenis'
         }
     }
-    environment {
-        SAUCELABS_CRED = credentials('molgenis-jenkins-saucelabs-secret')
-    }
     stages {
-        stage('Prepare') {
-            steps {
-                script {
-                    env.GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-                }
-            }
-        }
         stage('Build [ pull request ]') {
             when {
                 changeRequest()
