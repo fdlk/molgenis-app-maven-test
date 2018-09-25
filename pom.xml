@@ -4,18 +4,12 @@
     <groupId>org.molgenis</groupId>
     <artifactId>molgenis-app-maven-test</artifactId>
     <version>7.0.7</version>
-    <parent>
-        <groupId>io.spring.platform</groupId>
-        <artifactId>platform-bom</artifactId>
-        <version>Cairo-SR3</version>
-    </parent>
     <packaging>jar</packaging>
 
     <!-- More Project Information -->
     <name>MOLGENIS</name>
     <description>
-        MOLGENIS is a collaborative open source project on a mission to generate great software infrastructure for life
-        science research
+        This is a release test project
     </description>
     <url>http://www.molgenis.org</url>
     <licenses>
@@ -24,7 +18,7 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:https://github.com/sidohaakma/molgenis-app-maven-test.git</connection>
+        <connection>scm:git:https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@github.com/fdlk/molgenis-app-maven-test.git</connection>
         <url>https://github.com/molgenis/molgenis-app-maven-test</url>
         <tag>molgenis-app-maven-test-7.0.7</tag>
     </scm>
