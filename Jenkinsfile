@@ -8,8 +8,10 @@ pipeline {
         stage('Retrieve build secrets') {
             steps {
                 container('vault') {
-                    env.GITHUB_USER = sh(script: 'vault read -field=username secret/ops/token/github', returnStdout: true)
-                    env.GITHUB_TOKEN = sh(script: 'vault read -field=value secret/ops/token/github', returnStdout: true)
+                    script {
+                        env.GITHUB_USER = sh(script: 'vault read -field=username secret/ops/token/github', returnStdout: true)
+                        env.GITHUB_TOKEN = sh(script: 'vault read -field=value secret/ops/token/github', returnStdout: true)
+                    }
                 }
             }
         }
