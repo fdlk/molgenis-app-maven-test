@@ -136,13 +136,19 @@ pipeline {
                                 }
                                 container('maven') {
                                     sh "mvn -q -B release:prepare"
-                                    sh "echo 'docker tag+push registry/artifact:7.0.3'"
+                                    script {
+                                        env.RELEASE_TAG = sh(
+                                                script: "grep project.rel release.properties | cut -d'=' -f2",
+                                                returnStdout: true
+                                        )
+                                    }
+                                    sh "echo 'docker tag+push registry/artifact:$RELEASE_TAG'"
                                 }
                             }
                         }
                         stage('Deploy on test') {
                             steps {
-                                sh "echo 'helm upgrade test registry/artifact:7.0.3'"
+                                sh "echo 'helm upgrade test registry/artifact:$RELEASE_TAG'"
                             }
                         }
                         stage('Perform release') {
@@ -152,7 +158,7 @@ pipeline {
                                 }
                                 container('maven') {
                                     sh "mvn -B release:perform"
-                                    sh "echo 'docker tag+push hub/artifact:7.0.3'"
+                                    sh "echo 'docker tag+push hub/artifact:$RELEASE_TAG'"
                                     sh "echo 'docker tag+push hub/artifact:stable'"
                                     sh "echo 'docker tag+push hub/artifact:${BRANCH_NAME}-stable'"
                                 }
