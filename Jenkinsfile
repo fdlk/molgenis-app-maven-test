@@ -51,18 +51,20 @@ pipeline {
             }
             stages {
                 stage('Build'){
-                    sh "mvn -q -B clean verify"
+                    steps {
+                        sh "mvn -q -B clean verify"
+                    }
                 }
                 stage('Prepare Release'){
-                    timeout(time: 10, unit: 'MINUTES') {
-                        script {
-                            env.RELEASE_SCOPE = input(
-                                    message: 'Prepare to release?',
-                                    ok: 'Create'
-                            )
-                        }
-                    }
                     steps {
+                        timeout(time: 10, unit: 'MINUTES') {
+                            script {
+                                env.RELEASE_SCOPE = input(
+                                        message: 'Prepare to release?',
+                                        ok: 'Create'
+                                )
+                            }
+                        }
                         container('maven') {
                             sh "mvn -q -B release:prepare"
                             sh "echo 'docker tag+push registry/artifact:7.0.3'"
