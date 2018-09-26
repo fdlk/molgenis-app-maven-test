@@ -18,7 +18,9 @@ pipeline {
                         env.GITHUB_USER = sh(script: 'vault read -field=username secret/ops/token/github', returnStdout: true)
                     }
                 }
-                stash includes: '../../.m2/settings.xml', name: 'maven-settings'
+                dir('/home/jenkins/.m2'){
+                    stash includes: 'settings.xml', name: 'maven-settings'
+                }
                 input(message: 'Do you want to continue?')
             }
         }
@@ -60,8 +62,10 @@ pipeline {
                     stages {
                         stage('Build') {
                             steps {
-                                container('maven') {
+                                dir('/home/jenkins/.m2'){
                                     unstash 'maven-settings'
+                                }
+                                container('maven') {
                                     sh "mvn -q -B clean verify"
                                     sh "echo 'docker tag+push registry/artifact:dev'"
                                     sh "echo 'docker tag+push registry/artifact:dev-$BUILD_NUMBER'"
@@ -91,8 +95,10 @@ pipeline {
                     stages {
                         stage('Build [ x.x ]') {
                             steps {
-                                container('maven') {
+                                dir('/home/jenkins/.m2'){
                                     unstash 'maven-settings'
+                                }
+                                container('maven') {
                                     sh "mvn -q -B clean verify"
                                 }
                             }
