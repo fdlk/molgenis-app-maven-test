@@ -18,7 +18,7 @@ pipeline {
                         env.GITHUB_USER = sh(script: 'vault read -field=username secret/ops/token/github', returnStdout: true)
                     }
                 }
-                stash includes: '/home/jenkins/.m2/settings.xml', name: 'maven-settings'
+                stash includes: '.m2/settings.xml', name: 'maven-settings'
                 input(message: 'Do you want to continue?')
             }
         }
