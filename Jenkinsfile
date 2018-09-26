@@ -43,6 +43,12 @@ pipeline {
         stage('Build [ master ]') {
             when {
                 branch 'master'
+                beforeAgent true
+            }
+            agent {
+                kubernetes {
+                    label('molgenis-it')
+                }
             }
             stages {
                 stage('Build') {
@@ -67,6 +73,12 @@ pipeline {
         stage('Build [ x.x ]') {
             when {
                 expression { BRANCH_NAME ==~ /[0-9]\.[0-9]/ }
+                beforeAgent true
+            }
+            agent {
+                kubernetes {
+                    label('molgenis-it')
+                }
             }
             stages {
                 stage('Build') {
