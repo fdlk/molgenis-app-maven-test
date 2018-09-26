@@ -44,10 +44,22 @@ pipeline {
             when {
                 branch 'master'
             }
-            steps {
-                container('maven') {
-                    sh "mvn -q -B clean verify"
-                    sh "echo 'docker tag+push registry/artifact:latest'"
+            stages {
+                stage('Build') {
+                    steps {
+                        container('maven') {
+                            sh "mvn -q -B clean verify"
+                            sh "echo 'docker tag+push registry/artifact:dev'"
+                            sh "echo 'docker tag+push registry/artifact:dev-$BUILD_NUMBER'"
+                        }
+                    }
+                }
+                stage('Deploy') {
+                    steps {
+                        container('helm') {
+                            sh "echo 'helm upgrade dev-$BUILD_NUMBER'"
+                        }
+                    }
                 }
             }
         }
@@ -57,14 +69,14 @@ pipeline {
                 expression { BRANCH_NAME ==~ /[0-9]\.[0-9]/ }
             }
             stages {
-                stage('Build'){
+                stage('Build') {
                     steps {
-                        container('maven'){
+                        container('maven') {
                             sh "mvn -q -B clean verify"
                         }
                     }
                 }
-                stage('Prepare Release'){
+                stage('Prepare Release') {
                     steps {
                         timeout(time: 10, unit: 'MINUTES') {
                             input(message: 'Prepare to release?')
@@ -75,17 +87,17 @@ pipeline {
                         }
                     }
                 }
-                stage('Install on test') {
+                stage('Deploy on test') {
                     steps {
                         sh "echo 'helm upgrade test registry/artifact:7.0.3'"
                     }
                 }
-                stage('Perform release'){
+                stage('Perform release') {
                     steps {
                         timeout(time: 10, unit: 'DAYS') {
                             input(message: 'Do you want to release?')
                         }
-                        container('maven'){
+                        container('maven') {
                             sh "mvn -B release:perform"
                             sh "echo 'docker tag+push hub/artifact:7.0.3'"
                             sh "echo 'docker tag+push hub/artifact:stable'"
