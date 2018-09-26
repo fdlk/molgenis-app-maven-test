@@ -19,6 +19,7 @@ pipeline {
                     }
                 }
                 stash includes: '/home/jenkins/.m2/settings.xml', name: 'maven-settings'
+                input(message: 'Do you want to continue?')
             }
         }
         stage ('Build'){
