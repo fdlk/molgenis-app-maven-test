@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.molgenis</groupId>
   <artifactId>molgenis-app-maven-test</artifactId>
-  <version>7.0.13-SNAPSHOT</version>
+  <version>7.0.14-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <!-- More Project Information -->
