@@ -52,7 +52,9 @@ pipeline {
             stages {
                 stage('Build'){
                     steps {
-                        sh "mvn -q -B clean verify"
+                        container('maven'){
+                            sh "mvn -q -B clean verify"
+                        }
                     }
                 }
                 stage('Prepare Release'){
@@ -86,10 +88,12 @@ pipeline {
                                 )
                             }
                         }
-                        sh "mvn -q -B release:perform"
-                        sh "echo 'docker tag+push hub/artifact:7.0.3'"
-                        sh "echo 'docker tag+push hub/artifact:stable'"
-                        sh "echo 'docker tag+push hub/artifact:${BRANCH_NAME}-stable'"
+                        container('maven'){
+                            sh "mvn -q -B release:perform"
+                            sh "echo 'docker tag+push hub/artifact:7.0.3'"
+                            sh "echo 'docker tag+push hub/artifact:stable'"
+                            sh "echo 'docker tag+push hub/artifact:${BRANCH_NAME}-stable'"
+                        }
                     }
                 }
             }
