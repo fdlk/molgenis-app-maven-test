@@ -1,30 +1,17 @@
 pipeline {
     agent {
-        kubernetes {
-            label 'molgenis'
-        }
+        any
     }
-    stages {
-        stage('Retrieve build secrets') {
-            steps {
-                container('vault') {
-                    script {
-                        sh "mkdir /home/jenkins/.m2"
-                        sh(script: 'vault read -field=value secret/ops/jenkins/maven/settings.xml > /home/jenkins/.m2/settings.xml')
-                        env.SONAR_TOKEN = sh(script: 'vault read -field=value secret/ops/token/sonar', returnStdout: true)
-                        env.GITHUB_TOKEN = sh(script: 'vault read -field=value secret/ops/token/github', returnStdout: true)
-                        env.PGP_PASSPHRASE = 'literal:' + sh(script: 'vault read -field=passphrase secret/ops/certificate/pgp/molgenis-ci', returnStdout: true)
-                        env.PGP_SECRETKEY = "keyfile:/home/jenkins/key.asc"
-                        sh(script: 'vault read -field=secret.asc secret/ops/certificate/pgp/molgenis-ci > /home/jenkins/key.asc')
-                        env.CODECOV_TOKEN = sh(script: 'vault read -field=value secret/ops/token/codecov', returnStdout: true)
-                        env.GITHUB_USER = sh(script: 'vault read -field=username secret/ops/token/github', returnStdout: true)
-                    }
-                }
-            }
-        }
+    parallel {
         stage('Build [ pull request ]') {
             when {
                 changeRequest()
+                beforeAgent true
+            }
+            agent {
+                kubernetes {
+                    label('molgenis')
+                }
             }
             environment {
                 //PR-1234-231
@@ -32,10 +19,31 @@ pipeline {
                 //0.0.0-SNAPSHOT-PR-1234-231
                 PREVIEW_VERSION = "0.0.0-SNAPSHOT-${TAG}"
             }
-            steps {
-                container('maven') {
-                    sh "mvn versions:set -DnewVersion=${PREVIEW_VERSION} -DgenerateBackupPoms=false"
-                    sh "mvn clean install -Dmaven.test.redirectTestOutputToFile=true -DskipITs -Ddockerfile.tag=${TAG} -Ddockerfile.skip=false"
+            stages {
+                stage('Retrieve build secrets') {
+                    steps {
+                        container('vault') {
+                            script {
+                                sh "mkdir /home/jenkins/.m2"
+                                sh(script: 'vault read -field=value secret/ops/jenkins/maven/settings.xml > /home/jenkins/.m2/settings.xml')
+                                env.SONAR_TOKEN = sh(script: 'vault read -field=value secret/ops/token/sonar', returnStdout: true)
+                                env.GITHUB_TOKEN = sh(script: 'vault read -field=value secret/ops/token/github', returnStdout: true)
+                                env.PGP_PASSPHRASE = 'literal:' + sh(script: 'vault read -field=passphrase secret/ops/certificate/pgp/molgenis-ci', returnStdout: true)
+                                env.PGP_SECRETKEY = "keyfile:/home/jenkins/key.asc"
+                                sh(script: 'vault read -field=secret.asc secret/ops/certificate/pgp/molgenis-ci > /home/jenkins/key.asc')
+                                env.CODECOV_TOKEN = sh(script: 'vault read -field=value secret/ops/token/codecov', returnStdout: true)
+                                env.GITHUB_USER = sh(script: 'vault read -field=username secret/ops/token/github', returnStdout: true)
+                            }
+                        }
+                    }
+                }
+                stage('Build') {
+                    steps {
+                        container('maven') {
+                            sh "mvn versions:set -DnewVersion=${PREVIEW_VERSION} -DgenerateBackupPoms=false"
+                            sh "mvn clean install -Dmaven.test.redirectTestOutputToFile=true -DskipITs -Ddockerfile.tag=${TAG} -Ddockerfile.skip=false"
+                        }
+                    }
                 }
             }
         }
@@ -51,6 +59,23 @@ pipeline {
                 }
             }
             stages {
+                stage('Retrieve build secrets') {
+                    steps {
+                        container('vault') {
+                            script {
+                                sh "mkdir /home/jenkins/.m2"
+                                sh(script: 'vault read -field=value secret/ops/jenkins/maven/settings.xml > /home/jenkins/.m2/settings.xml')
+                                env.SONAR_TOKEN = sh(script: 'vault read -field=value secret/ops/token/sonar', returnStdout: true)
+                                env.GITHUB_TOKEN = sh(script: 'vault read -field=value secret/ops/token/github', returnStdout: true)
+                                env.PGP_PASSPHRASE = 'literal:' + sh(script: 'vault read -field=passphrase secret/ops/certificate/pgp/molgenis-ci', returnStdout: true)
+                                env.PGP_SECRETKEY = "keyfile:/home/jenkins/key.asc"
+                                sh(script: 'vault read -field=secret.asc secret/ops/certificate/pgp/molgenis-ci > /home/jenkins/key.asc')
+                                env.CODECOV_TOKEN = sh(script: 'vault read -field=value secret/ops/token/codecov', returnStdout: true)
+                                env.GITHUB_USER = sh(script: 'vault read -field=username secret/ops/token/github', returnStdout: true)
+                            }
+                        }
+                    }
+                }
                 stage('Build') {
                     steps {
                         container('maven') {
@@ -81,6 +106,23 @@ pipeline {
                 }
             }
             stages {
+                stage('Retrieve build secrets') {
+                    steps {
+                        container('vault') {
+                            script {
+                                sh "mkdir /home/jenkins/.m2"
+                                sh(script: 'vault read -field=value secret/ops/jenkins/maven/settings.xml > /home/jenkins/.m2/settings.xml')
+                                env.SONAR_TOKEN = sh(script: 'vault read -field=value secret/ops/token/sonar', returnStdout: true)
+                                env.GITHUB_TOKEN = sh(script: 'vault read -field=value secret/ops/token/github', returnStdout: true)
+                                env.PGP_PASSPHRASE = 'literal:' + sh(script: 'vault read -field=passphrase secret/ops/certificate/pgp/molgenis-ci', returnStdout: true)
+                                env.PGP_SECRETKEY = "keyfile:/home/jenkins/key.asc"
+                                sh(script: 'vault read -field=secret.asc secret/ops/certificate/pgp/molgenis-ci > /home/jenkins/key.asc')
+                                env.CODECOV_TOKEN = sh(script: 'vault read -field=value secret/ops/token/codecov', returnStdout: true)
+                                env.GITHUB_USER = sh(script: 'vault read -field=username secret/ops/token/github', returnStdout: true)
+                            }
+                        }
+                    }
+                }
                 stage('Build') {
                     steps {
                         container('maven') {
