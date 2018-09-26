@@ -4,14 +4,21 @@ pipeline {
             label 'molgenis'
         }
     }
-    environment {
-        SAUCELABS_CRED = credentials('molgenis-jenkins-saucelabs-secret')
-    }
     stages {
-        stage('Prepare') {
+        stage('Retrieve build secrets') {
             steps {
-                script {
-                    env.GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                container('vault') {
+                    script {
+                        sh "mkdir /home/jenkins/.m2"
+                        sh(script: 'vault read -field=value secret/ops/jenkins/maven/settings.xml > /home/jenkins/.m2/settings.xml')
+                        env.SONAR_TOKEN = sh(script: 'vault read -field=value secret/ops/token/sonar', returnStdout: true)
+                        env.GITHUB_TOKEN = sh(script: 'vault read -field=value secret/ops/token/github', returnStdout: true)
+                        env.PGP_PASSPHRASE = 'literal:' + sh(script: 'vault read -field=passphrase secret/ops/certificate/pgp/molgenis-ci', returnStdout: true)
+                        env.PGP_SECRETKEY = "keyfile:/home/jenkins/key.asc"
+                        sh(script: 'vault read -field=secret.asc secret/ops/certificate/pgp/molgenis-ci > /home/jenkins/key.asc')
+                        env.CODECOV_TOKEN = sh(script: 'vault read -field=value secret/ops/token/codecov', returnStdout: true)
+                        env.GITHUB_USER = sh(script: 'vault read -field=username secret/ops/token/github', returnStdout: true)
+                    }
                 }
             }
         }
@@ -37,53 +44,66 @@ pipeline {
             when {
                 branch 'master'
             }
-            environment {
-                TAG = 'latest'
-            }
-            steps {
-                container('maven') {
-                    sh "mvn clean install -Dmaven.test.redirectTestOutputToFile=true -DskipITs -Ddockerfile.tag=${TAG} -Ddockerfile.skip=false"
+            stages {
+                stage('Build') {
+                    steps {
+                        container('maven') {
+                            sh "mvn -q -B clean verify"
+                            sh "echo 'docker tag+push registry/artifact:dev'"
+                            sh "echo 'docker tag+push registry/artifact:dev-$BUILD_NUMBER'"
+                        }
+                    }
+                }
+                stage('Deploy') {
+                    steps {
+                        container('helm') {
+                            sh "echo 'helm upgrade dev-$BUILD_NUMBER'"
+                        }
+                    }
                 }
             }
         }
+
         stage('Build [ x.x ]') {
             when {
                 expression { BRANCH_NAME ==~ /[0-9]\.[0-9]/ }
             }
-            environment {
-                TAG = 'stable'
-            }
-            steps {
-                container('maven') {
-                    sh "mvn clean install -Dmaven.test.redirectTestOutputToFile=true -DskipITs -Ddockerfile.tag=${BRANCH_NAME}-${TAG} -Ddockerfile.skip=false"
-                }
-            }
-        }
-        stage('Release [ x.x ]') {
-            when {
-                expression { BRANCH_NAME ==~ /[0-9]\.[0-9]/ }
-            }
-            environment {
-                TAG = 'stable'
-                ORG = 'org.molgenis'
-                APP_NAME = 'molgenis-app-maven-test'
-            }
-            steps {
-                timeout(time: 10, unit: 'MINUTES') {
-                    script {
-                        env.RELEASE_SCOPE = input(
-                                message: 'Do you want to release?',
-                                ok: 'Release',
-                                parameters: [
-                                        choice(choices: 'candidate\nrelease', description: '', name: 'RELEASE_SCOPE')
-                                ]
-                        )
+            stages {
+                stage('Build') {
+                    steps {
+                        container('maven') {
+                            sh "mvn -q -B clean verify"
+                        }
                     }
                 }
-                milestone 1
-                container('maven') {
-                    sh ".release/generate_release_properties.bash ${APP_NAME} ${ORG} ${env.RELEASE_SCOPE}"
-                    sh "mvn release:prepare release:perform -Dmaven.test.redirectTestOutputToFile=true -DskipITs -Ddockerfile.tag=${BRANCH_NAME}-${TAG} -Ddockerfile.skip=false"
+                stage('Prepare Release') {
+                    steps {
+                        timeout(time: 10, unit: 'MINUTES') {
+                            input(message: 'Prepare to release?')
+                        }
+                        container('maven') {
+                            sh "mvn -q -B release:prepare"
+                            sh "echo 'docker tag+push registry/artifact:7.0.3'"
+                        }
+                    }
+                }
+                stage('Deploy on test') {
+                    steps {
+                        sh "echo 'helm upgrade test registry/artifact:7.0.3'"
+                    }
+                }
+                stage('Perform release') {
+                    steps {
+                        timeout(time: 10, unit: 'DAYS') {
+                            input(message: 'Do you want to release?')
+                        }
+                        container('maven') {
+                            sh "mvn -B release:perform"
+                            sh "echo 'docker tag+push hub/artifact:7.0.3'"
+                            sh "echo 'docker tag+push hub/artifact:stable'"
+                            sh "echo 'docker tag+push hub/artifact:${BRANCH_NAME}-stable'"
+                        }
+                    }
                 }
             }
         }

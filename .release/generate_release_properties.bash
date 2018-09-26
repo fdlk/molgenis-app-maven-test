@@ -17,6 +17,7 @@ MINOR=${VERSION_PARSED[1]}
 PATCH_PARSED=(${VERSION_PARSED[2]//-/ })
 PATCH=${PATCH_PARSED[0]}
 
+git fetch --tags
 CANDIDATE_NUMBER=1
 TAGS=$(git tag -l "[${MAJOR}]\.[${MINOR}]\.[${PATCH}]-RC*")
 for tag in "${TAGS[@]}"; do
