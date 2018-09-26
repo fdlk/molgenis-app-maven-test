@@ -1,17 +1,14 @@
 pipeline {
     agent {
-        any
+        kubernetes {
+            label('molgenis')
+        }
     }
     parallel {
         stage('Build [ pull request ]') {
             when {
                 changeRequest()
                 beforeAgent true
-            }
-            agent {
-                kubernetes {
-                    label('molgenis')
-                }
             }
             environment {
                 //PR-1234-231
