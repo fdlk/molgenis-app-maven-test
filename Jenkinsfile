@@ -60,12 +60,7 @@ pipeline {
                 stage('Prepare Release'){
                     steps {
                         timeout(time: 10, unit: 'MINUTES') {
-                            script {
-                                env.RELEASE_SCOPE = input(
-                                        message: 'Prepare to release?',
-                                        ok: 'Create'
-                                )
-                            }
+                            input(message: 'Prepare to release?')
                         }
                         container('maven') {
                             sh "mvn -q -B release:prepare"
@@ -81,15 +76,10 @@ pipeline {
                 stage('Perform release'){
                     steps {
                         timeout(time: 10, unit: 'DAYS') {
-                            script {
-                                env.RELEASE_SCOPE = input(
-                                        message: 'Do you want to release?',
-                                        ok: 'Release'
-                                )
-                            }
+                            input(message: 'Do you want to release?')
                         }
                         container('maven'){
-                            sh "mvn -q -B release:perform"
+                            sh "mvn -B release:perform"
                             sh "echo 'docker tag+push hub/artifact:7.0.3'"
                             sh "echo 'docker tag+push hub/artifact:stable'"
                             sh "echo 'docker tag+push hub/artifact:${BRANCH_NAME}-stable'"
