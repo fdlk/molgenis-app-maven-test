@@ -23,7 +23,7 @@ pipeline {
                 //PR-1234-231
                 TAG = "PR-${CHANGE_ID}-${BUILD_NUMBER}"
                 //0.0.0-SNAPSHOT-PR-1234-231
-                PREVIEW_VERSION = "0.0.0-SNAPSHOT-${TAG}"qq
+                PREVIEW_VERSION = "0.0.0-SNAPSHOT-${TAG}"
             }
             steps {
                 container('maven') {
@@ -37,58 +37,58 @@ pipeline {
             when {
                 branch 'master'
             }
-            environment {
-                TAG = 'latest'
-            }
             steps {
                 container('maven') {
-                    sh "mvn -q -B install"
+                    sh "mvn -q -B clean verify"
+                    sh "echo 'docker tag+push registry/artifact:latest'"
                 }
             }
         }
+
         stage('Build [ x.x ]') {
             when {
                 expression { BRANCH_NAME ==~ /[0-9]\.[0-9]/ }
             }
-            environment {
-                TAG = 'stable'
-            }
-            steps {
-                container('maven') {
-                    sh "mvn -q -B release:prepare"
+            stages {
+                stage('Build'){
+                    sh "mvn -q -B clean verify"
                 }
-            }
-        }
-        stage('Release [ x.x ]') {
-            when {
-                expression { BRANCH_NAME ==~ /[0-9]\.[0-9]/ }
-            }
-            environment {
-                TAG = 'stable'
-                ORG = 'sidohaakma'
-                GROUP_NAME = 'org.molgenis'
-                APP_NAME = 'molgenis-app-maven-test'
-                GITHUB_CRED = credentials('molgenis-jenkins-github-secret')
-            }
-            steps {
-                timeout(time: 10, unit: 'MINUTES') {
-                    script {
-                        env.RELEASE_SCOPE = input(
-                                message: 'Do you want to release?',
-                                ok: 'Release',
-                                parameters: [
-                                        choice(choices: 'candidate\nrelease', description: '', name: 'RELEASE_SCOPE')
-                                ]
-                        )
+                stage('Prepare Release'){
+                    timeout(time: 10, unit: 'MINUTES') {
+                        script {
+                            env.RELEASE_SCOPE = input(
+                                    message: 'Prepare to release?',
+                                    ok: 'Create'
+                            )
+                        }
+                    }
+                    steps {
+                        container('maven') {
+                            sh "mvn -q -B release:prepare"
+                            sh "echo 'docker tag+push registry/artifact:7.0.3'"
+                        }
                     }
                 }
-                milestone 1
-                container('maven') {
-//                    sh "git remote set-url origin https://${env.GITHUB_CRED_PSW}@github.com/${ORG}/${APP_NAME}.git"
-//                    sh "git checkout -f ${BRANCH_NAME}"
-//                    sh ".release/generate_release_properties.bash ${APP_NAME} ${GROUP_NAME} ${env.RELEASE_SCOPE}"
-                    sh "mvn release:perform"
-//                    sh "git push --tags origin ${BRANCH_NAME}"
+                stage('Install on test') {
+                    steps {
+                        sh "echo 'helm upgrade test registry/artifact:7.0.3'"
+                    }
+                }
+                stage('Perform release'){
+                    steps {
+                        timeout(time: 10, unit: 'DAYS') {
+                            script {
+                                env.RELEASE_SCOPE = input(
+                                        message: 'Do you want to release?',
+                                        ok: 'Release'
+                                )
+                            }
+                        }
+                        sh "mvn -q -B release:perform"
+                        sh "echo 'docker tag+push hub/artifact:7.0.3'"
+                        sh "echo 'docker tag+push hub/artifact:stable'"
+                        sh "echo 'docker tag+push hub/artifact:${BRANCH_NAME}-stable'"
+                    }
                 }
             }
         }
