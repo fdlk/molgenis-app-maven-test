@@ -22,7 +22,7 @@
       scm:git:https://${env.GITHUB_USER}:${env.GITHUB_TOKEN}@github.com/fdlk/molgenis-app-maven-test.git
     </connection>
     <url>https://github.com/molgenis/molgenis-app-maven-test</url>
-    <tag>molgenis-app-maven-test-7.0.7</tag>
+    <tag>molgenis-app-maven-test-7.0.18</tag>
   </scm>
 
   <developers>
