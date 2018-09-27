@@ -24,7 +24,7 @@ pipeline {
                 input(message: 'Do you want to continue?')
             }
         }
-        stage('Build [ pull request ]') {
+        stage('Steps [ PR ]') {
             when {
                 changeRequest()
                 beforeAgent true
@@ -36,7 +36,7 @@ pipeline {
                 PREVIEW_VERSION = "0.0.0-SNAPSHOT-${TAG}"
             }
             stages {
-                stage('Build') {
+                stage('Build [ PR ]') {
                     steps {
                         container('maven') {
                             sh "mvn versions:set -DnewVersion=${PREVIEW_VERSION} -DgenerateBackupPoms=false"
@@ -46,19 +46,12 @@ pipeline {
                 }
             }
         }
-
-        stage('Build [ master ]') {
+        stage('Steps [ master ]') {
             when {
                 branch 'master'
-                beforeAgent true
-            }
-            agent {
-                kubernetes {
-                    label('molgenis-it')
-                }
             }
             stages {
-                stage('Build') {
+                stage('Build [ master ]') {
                     steps {
                         dir('/home/jenkins/.m2'){
                             unstash 'maven-settings'
@@ -70,7 +63,7 @@ pipeline {
                         }
                     }
                 }
-                stage('Deploy') {
+                stage('Deploy [ master ]') {
                     steps {
                         container('helm') {
                             sh "echo 'helm upgrade dev-$BUILD_NUMBER'"
@@ -79,8 +72,7 @@ pipeline {
                 }
             }
         }
-
-        stage('Build [ x.x ]') {
+        stage('Steps [ x.x ]') {
             when {
                 expression { BRANCH_NAME ==~ /[0-9]\.[0-9]/ }
                 beforeAgent true
@@ -101,7 +93,7 @@ pipeline {
                         }
                     }
                 }
-                stage('Prepare Release') {
+                stage('Prepare Release [ x.x ]') {
                     steps {
                         timeout(time: 10, unit: 'MINUTES') {
                             input(message: 'Prepare to release?')
@@ -118,12 +110,12 @@ pipeline {
                         }
                     }
                 }
-                stage('Deploy on test') {
+                stage('Deploy on test [ x.x ]') {
                     steps {
                         sh "echo 'helm upgrade test registry/artifact:$RELEASE_TAG'"
                     }
                 }
-                stage('Perform release') {
+                stage('Perform release [ x.x ]') {
                     steps {
                         timeout(time: 10, unit: 'DAYS') {
                             input(message: 'Do you want to release?')
