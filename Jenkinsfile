@@ -21,7 +21,6 @@ pipeline {
                 dir('/home/jenkins/.m2'){
                     stash includes: 'settings.xml', name: 'maven-settings'
                 }
-                input(message: 'Do you want to continue?')
             }
         }
         stage('Steps [ PR ]') {
@@ -96,7 +95,7 @@ pipeline {
                 stage('Prepare Release [ x.x ]') {
                     steps {
                         timeout(time: 10, unit: 'MINUTES') {
-                            input(message: 'Prepare to release?')
+                            hubotApprove message: 'Prepare to release?'
                         }
                         container('maven') {
                             sh "mvn -q -B release:prepare"
@@ -118,7 +117,7 @@ pipeline {
                 stage('Perform release [ x.x ]') {
                     steps {
                         timeout(time: 10, unit: 'DAYS') {
-                            input(message: 'Do you want to release?')
+                            hubotApprove message: 'Do you want to release?'
                         }
                         container('vault') {
                             script {
@@ -132,6 +131,7 @@ pipeline {
                             sh "echo 'docker tag+push hub/artifact:stable'"
                             sh "echo 'docker tag+push hub/artifact:${BRANCH_NAME}-stable'"
                         }
+                        hubotSend message: "Released $RELEASE_TAG."
                     }
                 }
             }
